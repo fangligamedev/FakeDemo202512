@@ -61,8 +61,8 @@ export const DEMO_SCRIPT: DemoStep[] = [
         title: 'UI Design',
         description: 'Layout and style generation...',
         zone: 'builder',
-        duration: 3000,
-        asset: { type: 'image', url: '/assets/demo_v16/ui_hud.png' },
+        duration: 12000,
+        asset: { type: 'video', url: '/assets/demo_v16/doki_dialogue.mp4', previewUrl: '/assets/demo_v16/ui_hud.png' },
         uiAction: 'AUTO_PREVIEW'
     },
     {
@@ -109,8 +109,9 @@ export const DEMO_SCRIPT: DemoStep[] = [
         title: 'Game Video (VEO 3.1)',
         description: 'Generating gameplay trailer...',
         zone: 'marketing', // Or builder? Marketing makes sense for a trailer.
-        duration: 5000,
-        asset: { type: 'video', url: '/assets/demo_v16/gameplay_mock.mp4', previewUrl: '/assets/demo_v16/gameplay_thumb.png' }, // Mock URL
+        duration: 12000,
+        // Video generation step
+        asset: { type: 'video', url: '/assets/demo_v16/pixel_game_demo.mp4', previewUrl: '/assets/demo_v16/gameplay_thumb.png' },
         uiAction: 'AUTO_PREVIEW'
     },
 

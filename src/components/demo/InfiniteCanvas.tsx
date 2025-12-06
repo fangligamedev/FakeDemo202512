@@ -415,10 +415,12 @@ function PreviewView({ visible }: { visible: boolean }) {
                     transition={{ duration: 0.5 }}
                     className="absolute inset-0 z-20 flex bg-black items-center justify-center overflow-hidden"
                 >
-                    <img
-                        src="/images/doki_target.png"
-                        alt="Game Preview"
+                    <video
+                        src="/assets/demo_v16/doki_dialogue.mp4"
                         className="w-full h-full object-contain"
+                        autoPlay
+                        loop
+                        controls
                     />
 
                     {/* Overlay Info */}

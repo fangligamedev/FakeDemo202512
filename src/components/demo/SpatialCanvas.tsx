@@ -40,31 +40,35 @@ function SyntaxHighlight({ code }: { code: string }) {
     );
 }
 
-function VideoFrame({ url, thumb }: { url: string, thumb?: string }) {
+function VideoFrame({ url, thumb, isStreaming }: { url: string, thumb?: string, isStreaming: boolean }) {
     return (
         <div className="w-full h-full bg-black relative flex items-center justify-center group overflow-hidden rounded-xl border border-white/10">
-            {/* Simulating Video Player UI */}
-            <div className="absolute inset-0 bg-cover bg-center opacity-60 group-hover:opacity-40 transition-opacity duration-1000" style={{ backgroundImage: "url(" + thumb + ")" }} >
-                {/* Fake scanning lines */}
-                <div className="w-full h-full bg-[linear-gradient(transparent_50%,rgba(0,0,0,0.5)_50%)] bg-[length:10px_10px] opacity-20" />
-            </div>
-
-            <div className="relative z-10 flex flex-col items-center gap-4">
-                <div className="w-20 h-20 rounded-full bg-white/10 backdrop-blur flex items-center justify-center border border-white/20 shadow-[0_0_30px_rgba(59,130,246,0.3)] animate-pulse">
-                    <Sparkles className="w-8 h-8 text-blue-400 fill-blue-400" />
+            {/* Simulating Video Player UI - Generating State */}
+            {isStreaming && (
+                <div className="absolute inset-0 z-20 bg-black/80 flex flex-col items-center justify-center gap-4">
+                    <div className="w-24 h-24 rounded-full bg-blue-500/10 backdrop-blur flex items-center justify-center border border-blue-500/30 shadow-[0_0_50px_rgba(59,130,246,0.4)] animate-pulse">
+                        <Sparkles className="w-10 h-10 text-blue-400 fill-blue-400" />
+                    </div>
+                    <div className="text-2xl font-bold text-white tracking-widest uppercase animate-pulse">Generating Game</div>
+                    <div className="text-sm font-mono text-blue-400 w-64 h-2 bg-gray-800 rounded-full overflow-hidden relative">
+                        <motion.div initial={{ width: 0 }} animate={{ width: "100%" }} transition={{ duration: 1.5, ease: "linear" }} className="h-full bg-blue-500" />
+                    </div>
                 </div>
-                <div className="text-2xl font-bold text-white tracking-widest uppercase">Generating Video</div>
-                <div className="text-sm font-mono text-blue-400 w-64 h-2 bg-gray-800 rounded-full overflow-hidden relative">
-                    <motion.div initial={{ width: 0 }} animate={{ width: "100%" }} transition={{ duration: 4.5, ease: "linear" }} className="h-full bg-blue-500" />
-                </div>
-            </div>
+            )}
 
-            {/* Player Controls */}
-            <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-black to-transparent flex items-end px-6 py-4 gap-4">
-                <div className="w-4 h-4 rounded bg-white" />
-                <div className="flex-1 h-1 bg-gray-600 rounded-full"><div className="w-1/3 h-full bg-red-500" /></div>
-                <div className="text-xs font-mono text-gray-400">00:04 / 00:15</div>
-            </div>
+            {/* Actual Video Player */}
+            {!isStreaming && (
+                <video
+                    src={url}
+                    className="w-full h-full object-contain"
+                    autoPlay
+                    loop
+                    controls
+                />
+            )}
+
+            {/* Background Thumb (only visible if video not playing or transparent) - kept for transition */}
+            <div className="absolute inset-0 bg-cover bg-center -z-10 opacity-20" style={{ backgroundImage: "url(" + thumb + ")" }} />
         </div>
     )
 }
@@ -254,7 +258,7 @@ function AssetPreviewModal({ asset, visible, onClose, isStreaming = false }: { a
                 )}
 
                 {asset.type === 'video' && (
-                    <VideoFrame url={asset.url} thumb={asset.previewUrl} />
+                    <VideoFrame url={asset.url} thumb={asset.previewUrl} isStreaming={isStreaming} />
                 )}
 
                 {asset.type === 'dashboard' && (
