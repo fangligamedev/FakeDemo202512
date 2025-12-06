@@ -3,11 +3,71 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence, useMotionValue, animate } from 'framer-motion';
 import {
     Sparkles, Cpu, Image as ImageIcon, FileText,
-    CheckCircle2, Loader2, Code as CodeIcon,
+    CheckCircle2, Loader2, Code as CodeIcon, Activity,
     Layers, Box, Server, Search, Layout, Zap,
     TrendingUp, ShoppingBag, Twitter, X, Maximize2, MousePointer2
 } from 'lucide-react';
 import { DEMO_SCRIPT, DemoStep, AssetType } from '@/config/demo_script_v16';
+import MarketingDashboard from './MarketingDashboard';
+
+// --- Helper for Curves ---
+function getCurvePath(x1: number, y1: number, x2: number, y2: number) {
+    const dist = Math.abs(x2 - x1);
+    const cp1x = x1 + dist * 0.5;
+    const cp1y = y1;
+    const cp2x = x2 - dist * 0.5;
+    const cp2y = y2;
+    return "M " + x1 + " " + y1 + " C " + cp1x + " " + cp1y + ", " + cp2x + " " + cp2y + ", " + x2 + " " + y2;
+}
+
+function SyntaxHighlight({ code }: { code: string }) {
+    // Simple mock highlighter
+    const keywords = ['public', 'class', 'void', 'float', 'if', 'else', 'return', 'new', 'using', 'namespace', 'UnityEngine'];
+    const types = ['Vector3', 'Transform', 'GameObject', 'int', 'bool', 'string'];
+
+    const parts = code.split(/(\s+|[{}();,.])/g);
+
+    return (
+        <span className="whitespace-pre-wrap">
+            {parts.map((part, i) => {
+                if (keywords.includes(part)) return <span key={i} className="text-pink-400">{part}</span>;
+                if (types.includes(part)) return <span key={i} className="text-yellow-400">{part}</span>;
+                if (part.startsWith('"') && part.endsWith('"')) return <span key={i} className="text-green-400">{part}</span>;
+                if (part.startsWith('//')) return <span key={i} className="text-gray-500">{part}</span>;
+                return <span key={i} className="text-gray-300">{part}</span>;
+            })}
+        </span>
+    );
+}
+
+function VideoFrame({ url, thumb }: { url: string, thumb?: string }) {
+    return (
+        <div className="w-full h-full bg-black relative flex items-center justify-center group overflow-hidden rounded-xl border border-white/10">
+            {/* Simulating Video Player UI */}
+            <div className="absolute inset-0 bg-cover bg-center opacity-60 group-hover:opacity-40 transition-opacity duration-1000" style={{ backgroundImage: "url(" + thumb + ")" }} >
+                {/* Fake scanning lines */}
+                <div className="w-full h-full bg-[linear-gradient(transparent_50%,rgba(0,0,0,0.5)_50%)] bg-[length:10px_10px] opacity-20" />
+            </div>
+
+            <div className="relative z-10 flex flex-col items-center gap-4">
+                <div className="w-20 h-20 rounded-full bg-white/10 backdrop-blur flex items-center justify-center border border-white/20 shadow-[0_0_30px_rgba(59,130,246,0.3)] animate-pulse">
+                    <Sparkles className="w-8 h-8 text-blue-400 fill-blue-400" />
+                </div>
+                <div className="text-2xl font-bold text-white tracking-widest uppercase">Generating Video</div>
+                <div className="text-sm font-mono text-blue-400 w-64 h-2 bg-gray-800 rounded-full overflow-hidden relative">
+                    <motion.div initial={{ width: 0 }} animate={{ width: "100%" }} transition={{ duration: 4.5, ease: "linear" }} className="h-full bg-blue-500" />
+                </div>
+            </div>
+
+            {/* Player Controls */}
+            <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-black to-transparent flex items-end px-6 py-4 gap-4">
+                <div className="w-4 h-4 rounded bg-white" />
+                <div className="flex-1 h-1 bg-gray-600 rounded-full"><div className="w-1/3 h-full bg-red-500" /></div>
+                <div className="text-xs font-mono text-gray-400">00:04 / 00:15</div>
+            </div>
+        </div>
+    )
+}
 
 // --- Types & Constants ---
 const ZONES = { TREND: -3000, BUILDER: 0, MARKETING: 3000 };
@@ -70,43 +130,43 @@ function TrendRadar() {
 
 function IDEFrame({ children, filename }: { children: React.ReactNode, filename: string }) {
     return (
-        <div className="flex flex-col w-full h-full bg-[#1E1E1E] text-gray-300 font-mono text-sm">
+        <div className="flex flex-col w-full h-full bg-[#1E1E1E] text-gray-300 font-mono text-sm shadow-2xl">
             {/* Title Bar */}
-            <div className="flex items-center justify-between px-4 py-2 bg-[#252526] border-b border-black">
+            <div className="flex items-center justify-between px-4 py-3 bg-[#252526]">
                 <div className="flex items-center gap-2">
                     <div className="flex gap-1.5">
-                        <div className="w-3 h-3 rounded-full bg-red-500" />
-                        <div className="w-3 h-3 rounded-full bg-yellow-500" />
-                        <div className="w-3 h-3 rounded-full bg-green-500" />
+                        <div className="w-3 h-3 rounded-full bg-[#FF5F56]" />
+                        <div className="w-3 h-3 rounded-full bg-[#FFBD2E]" />
+                        <div className="w-3 h-3 rounded-full bg-[#27C93F]" />
                     </div>
-                    <span className="ml-4 text-xs opacity-60">VibeCoder - {filename}</span>
+                    <span className="ml-6 text-sm text-gray-400 font-sans">{filename} — VibeCoder</span>
                 </div>
             </div>
             <div className="flex flex-1 overflow-hidden">
                 {/* Sidebar */}
-                <div className="w-48 bg-[#252526] border-r border-[#3E3E42] flex flex-col p-2 gap-1">
-                    <div className="text-xs font-bold uppercase tracking-wider mb-2 opacity-50 pl-2">Explorer</div>
+                <div className="w-56 bg-[#252526] flex flex-col border-r border-[#191919]">
+                    <div className="p-3 text-xs font-bold text-gray-500 uppercase tracking-wider">Explorer</div>
                     {['src', 'assets', 'scripts', 'config'].map(f => (
-                        <div key={f} className="flex items-center gap-2 px-2 py-1 hover:bg-[#37373D] rounded cursor-pointer">
-                            <Layers size={12} /> <span>{f}</span>
+                        <div key={f} className="flex items-center gap-2 px-3 py-1.5 text-gray-400 hover:bg-[#2A2D2E] hover:text-white cursor-pointer">
+                            <Layers size={14} /> <span>{f}</span>
                         </div>
                     ))}
-                    <div className="mt-2 flex items-center gap-2 px-2 py-1 bg-[#37373D] text-white rounded">
-                        <CodeIcon size={12} className="text-blue-400" /> <span>{filename}</span>
+                    <div className="mt-2 flex items-center gap-2 px-3 py-1.5 bg-[#37373D] text-white">
+                        <CodeIcon size={14} className="text-[#4FC1FF]" /> <span>{filename}</span>
                     </div>
                 </div>
                 {/* Content */}
-                <div className="flex-1 overflow-auto bg-[#1E1E1E] p-4 relative">
+                <div className="flex-1 bg-[#1E1E1E] p-0 relative overflow-auto">
                     {children}
                 </div>
             </div>
             {/* Status Bar */}
-            <div className="h-6 bg-[#007ACC] flex items-center px-4 text-xs text-white justify-between">
+            <div className="h-6 bg-[#007ACC] flex items-center px-4 text-xs text-white justify-between select-none">
                 <div className="flex gap-4">
-                    <span>main*</span>
-                    <span>0 errors</span>
+                    <span className="flex items-center gap-1"><CheckCircle2 size={10} /> Ready</span>
+                    <span>Ln 12, Col 45</span>
                 </div>
-                <div>Ln 12, Col 45</div>
+                <span>UTF-8</span>
             </div>
         </div>
     )
@@ -144,6 +204,7 @@ function DocFrame({ children, title }: { children: React.ReactNode, title: strin
 function AssetPreviewModal({ asset, visible, onClose, isStreaming = false }: { asset: DemoStep['asset'], visible: boolean, onClose: () => void, isStreaming?: boolean }) {
     if (!asset || !visible) return null;
 
+    // ... content fetching logic (Keep existing) ...
     const [content, setContent] = useState<string>("");
     const [displayContent, setDisplayContent] = useState<string>("");
 
@@ -161,7 +222,7 @@ function AssetPreviewModal({ asset, visible, onClose, isStreaming = false }: { a
                         setDisplayContent(text.slice(0, i));
                         i += speed;
                         if (i > text.length) clearInterval(t);
-                    }, 5); // Faster typing
+                    }, 5);
                     return () => clearInterval(t);
                 }
             });
@@ -172,22 +233,46 @@ function AssetPreviewModal({ asset, visible, onClose, isStreaming = false }: { a
         <div className="fixed inset-0 z-50 flex items-center justify-center p-8 bg-black/60 backdrop-blur-sm" onClick={onClose}>
             <motion.div
                 initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}
-                className="w-full max-w-5xl h-[85vh] rounded-xl overflow-hidden shadow-2xl flex flex-col relative"
+                className="w-full max-w-6xl h-[85vh] rounded-xl overflow-hidden shadow-2xl flex flex-col relative bg-[#1E1E1E]"
                 onClick={e => e.stopPropagation()}
             >
-                <div className="absolute top-2 right-2 z-50">
-                    <button onClick={onClose} className="p-2 bg-black/50 hover:bg-black text-white rounded-full"><X size={16} /></button>
-                </div>
+                <button onClick={onClose} className="absolute top-4 right-4 z-[60] p-2 bg-black/50 text-white rounded-full hover:bg-red-500 transition-colors"><X size={16} /></button>
 
                 {asset.type === 'image' && (
-                    <div className="w-full h-full bg-[#1E1E1E] flex items-center justify-center border border-white/10 rounded-xl">
-                        <img src={asset.url} alt="Asset" className="max-w-full max-h-full object-contain animate-in fade-in duration-700" />
+                    <div className="w-full h-full flex items-center justify-center bg-[url('/images/transparent-bg.png')] relative overflow-hidden">
+                        {isStreaming && (
+                            <div className="absolute inset-0 z-10 bg-black/80 flex flex-col items-center justify-center gap-4">
+                                <Activity className="w-12 h-12 text-blue-500 animate-pulse" />
+                                <div className="text-blue-400 font-mono text-sm tracking-widest animate-pulse">GENERATING PIXEL ART...</div>
+                                <div className="w-64 h-1 bg-white/10 rounded-full overflow-hidden">
+                                    <motion.div initial={{ x: '-100%' }} animate={{ x: '100%' }} transition={{ duration: 1.5, repeat: Infinity, ease: 'linear' }} className="w-full h-full bg-blue-500/50" />
+                                </div>
+                            </div>
+                        )}
+                        <img src={asset.url} alt="Asset" className={`max-w-full max-h-full object-contain duration-1000 ${isStreaming ? 'opacity-0 blur-lg scale-95' : 'opacity-100 blur-0 scale-100'}`} />
+                    </div>
+                )}
+
+                {asset.type === 'video' && (
+                    <VideoFrame url={asset.url} thumb={asset.previewUrl} />
+                )}
+
+                {asset.type === 'dashboard' && (
+                    <div className="w-full h-full border border-white/10 rounded-xl overflow-hidden">
+                        <MarketingDashboard dataUrl={asset.url} />
                     </div>
                 )}
 
                 {asset.type === 'code' && (
                     <IDEFrame filename={asset.url.split('/').pop() || 'script.cs'}>
-                        <pre className="font-mono">{displayContent}{isStreaming && <span className="animate-pulse">|</span>}</pre>
+                        <div className="p-6 font-mono text-sm leading-relaxed">
+                            {isStreaming ? (
+                                <SyntaxHighlight code={displayContent} />
+                            ) : (
+                                <SyntaxHighlight code={content || displayContent} />
+                            )}
+                            {isStreaming && <span className="animate-pulse inline-block w-2 h-4 bg-white ml-1">|</span>}
+                        </div>
                     </IDEFrame>
                 )}
 
@@ -271,6 +356,38 @@ function TrendOverlay({ visible, onStart }: { visible: boolean, onStart: () => v
     );
 }
 
+function PromptOverlay({ onComplete, text }: { onComplete: () => void, text: string }) {
+    const [val, setVal] = useState("");
+
+    useEffect(() => {
+        let i = 0;
+        const t = setInterval(() => {
+            setVal(text.slice(0, i));
+            i++;
+            if (i > text.length + 10) {
+                clearInterval(t);
+                setTimeout(onComplete, 1000);
+            }
+        }, 50);
+        return () => clearInterval(t);
+    }, []);
+
+    return (
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0 z-40 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+            <div className="bg-[#1E1E1E] border border-white/20 p-6 rounded-xl shadow-2xl max-w-lg w-full">
+                <div className="flex items-center gap-2 mb-3 text-gray-400 text-xs font-mono uppercase tracking-widest">
+                    <Sparkles size={12} className="text-blue-400" /> AI Agent Input
+                </div>
+                <div className="bg-black/30 rounded-lg p-4 border border-white/10">
+                    <div className="text-xl font-light text-white font-mono break-words leading-relaxed">
+                        {val}<span className="animate-pulse text-blue-500">_</span>
+                    </div>
+                </div>
+            </div>
+        </motion.div>
+    )
+}
+
 function BuilderSidebar({ steps, activeStep }: { steps: typeof DEMO_SCRIPT, activeStep: number }) {
     return (
         <motion.div initial={{ x: 300 }} animate={{ x: 0 }} className="absolute top-0 right-0 w-80 h-full bg-[#080808]/95 border-l border-white/10 backdrop-blur-xl z-30 flex flex-col">
@@ -279,18 +396,23 @@ function BuilderSidebar({ steps, activeStep }: { steps: typeof DEMO_SCRIPT, acti
                 <div className="font-bold text-white">Builder Agent</div>
             </div>
             <div className="flex-1 overflow-y-auto p-6 space-y-4">
-                {steps.filter(s => s.zone === 'builder').map((step, i) => (
-                    <div key={step.id} className="relative pl-8 group transition-all duration-300" style={{ opacity: i > activeStep ? 0.3 : 1 }}>
-                        {i !== steps.filter(s => s.zone === 'builder').length - 1 && <div className="absolute left-[11px] top-6 bottom-[-16px] w-[2px] bg-white/5" />}
-                        <div className={`absolute left-0 top-1 w-6 h-6 rounded-full border-2 flex items-center justify-center z-10
-                             ${i < activeStep ? 'bg-blue-600 border-blue-600' : i === activeStep ? 'bg-black border-blue-500 animate-pulse' : 'bg-black border-white/10'}`}>
-                            {i < activeStep && <CheckCircle2 className="w-3 h-3 text-white" />}
+                {steps.filter(s => s.zone === 'builder').map((step, i) => {
+                    const isActive = i === activeStep;
+                    const isDone = i < activeStep;
+                    const statusClass = isDone ? 'bg-blue-600 border-blue-600' : isActive ? 'bg-black border-blue-500 animate-pulse' : 'bg-black border-white/10';
+
+                    return (
+                        <div key={step.id} className="relative pl-8 group transition-all duration-300" style={{ opacity: isDone || isActive ? 1 : 0.3 }}>
+                            {i !== steps.filter(s => s.zone === 'builder').length - 1 && <div className="absolute left-[11px] top-6 bottom-[-16px] w-[2px] bg-white/5" />}
+                            <div className={`absolute left-0 top-1 w-6 h-6 rounded-full border-2 flex items-center justify-center z-10 ${statusClass} `}>
+                                {isDone && <CheckCircle2 className="w-3 h-3 text-white" />}
+                            </div>
+                            <div className="text-sm font-bold text-gray-200">{step.title}</div>
+                            <div className="text-[10px] text-gray-500 font-mono">{step.description}</div>
+                            {isActive && <div className="mt-2 text-[10px] text-blue-400 font-mono animate-pulse">&gt; Processing...</div>}
                         </div>
-                        <div className="text-sm font-bold text-gray-200">{step.title}</div>
-                        <div className="text-[10px] text-gray-500 font-mono">{step.description}</div>
-                        {i === activeStep && <div className="mt-2 text-[10px] text-blue-400 font-mono animate-pulse">&gt; Processing...</div>}
-                    </div>
-                ))}
+                    );
+                })}
             </div>
         </motion.div>
     )
@@ -308,19 +430,30 @@ export default function SpatialCanvas() {
     // UI States
     const [previewAsset, setPreviewAsset] = useState<DemoStep['asset'] | undefined>(undefined);
     const [isStreaming, setIsStreaming] = useState(false);
+    const [showGamePrompt, setShowGamePrompt] = useState(false); // New State
 
     // Cursor Sim
     const [cursorPos, setCursorPos] = useState({ x: 0, y: 0 });
     const [cursorClick, setCursorClick] = useState(false);
 
+    // Updated Flow: Trend -> (Done) -> Builder Prompt -> (Done) -> Builder Sequence
     const handleTrendDone = () => {
+        // Instead of directly builder, show prompt
+        setShowGamePrompt(true);
+    };
+
+    const handleGamePromptDone = () => {
+        setShowGamePrompt(false);
         setZone('builder');
         animate(camX, -ZONES.BUILDER, { duration: 2, ease: "easeInOut" });
         setTimeout(runBuilderSequence, 2000);
-    };
+    }
 
     const runBuilderSequence = async () => {
         const builderSteps = DEMO_SCRIPT.filter(s => s.zone === 'builder' || s.zone === 'marketing');
+
+        // Initial mouse pos
+        setCursorPos({ x: window.innerWidth / 2, y: window.innerHeight / 2 });
 
         for (let i = 0; i < builderSteps.length; i++) {
             const step = builderSteps[i];
@@ -346,8 +479,19 @@ export default function SpatialCanvas() {
                 // Wait for node to appear
                 await new Promise(r => setTimeout(r, 500));
 
-                // Move Cursor
-                setCursorPos({ x: nx + 32, y: ny + 32 }); // Move to center of node
+                // Move Cursor (Account for Global X offset in component logic, but here we set absolute screen pos roughly)
+                // Actually screen pos needs to map to world pos.
+                // Simplified: Just animate cursor to where the node IS on screen.
+                // Node X is world X. Cam X is offset. Screen X = Node X + Cam X + ScreenCenter.
+                // We'll approximate for visual effect or calculate correctly.
+
+                const screenCenter = window.innerWidth / 2;
+                const camOffset = camX.get(); // Get current camera offset
+                const screenX = nx + camOffset + screenCenter;
+                const screenY = ny + window.innerHeight / 2; // Since we centered y
+
+                setCursorPos({ x: screenX + 128, y: screenY + 32 }); // Center of node (w=256, h=64 approx)
+
                 await new Promise(r => setTimeout(r, 800)); // Travel time
 
                 // Click
@@ -358,26 +502,27 @@ export default function SpatialCanvas() {
                 // Open Asset
                 setPreviewAsset(step.asset);
                 setIsStreaming(true);
-            } else if (step.uiAction === 'CODE_VIEW_OPEN' && step.asset) {
-                // Keep legacy support for now, or unified
-                // Wait for node to appear
-                await new Promise(r => setTimeout(r, 500));
 
-                // Move Cursor
-                setCursorPos({ x: nx + 32, y: ny + 32 }); // Move to center of node
-                await new Promise(r => setTimeout(r, 800)); // Travel time
+                // Wait for generation animation (1.5s)
+                await new Promise(r => setTimeout(r, 1500));
 
-                // Click
-                setCursorClick(true);
-                await new Promise(r => setTimeout(r, 200));
-                setCursorClick(false);
+                // Show content
+                setIsStreaming(false);
 
+                // Wait remaining duration
+                const remaining = Math.max(0, step.duration - 1500);
+                await new Promise(r => setTimeout(r, remaining));
+            }
+            else if (step.uiAction === 'CODE_VIEW_OPEN' && step.asset) {
+                // Legacy support same flow
                 setPreviewAsset(step.asset);
                 setIsStreaming(true);
             }
 
-            // 3. Duration Wait (Reading time)
-            await new Promise(r => setTimeout(r, step.duration));
+            // 3. Duration Wait (Reading time) - ONLY for non-auto-preview steps or if we didn't wait above
+            if (step.uiAction !== 'AUTO_PREVIEW') {
+                await new Promise(r => setTimeout(r, step.duration));
+            }
 
             // 4. Close Preview
             if (step.uiAction === 'AUTO_PREVIEW' || step.uiAction === 'CODE_VIEW_OPEN') {
@@ -405,6 +550,27 @@ export default function SpatialCanvas() {
                 <div className="absolute top-[-400px] left-[-200px] text-6xl font-bold text-white/5 uppercase">Builder Zone</div>
                 <div className="absolute top-[-400px] left-[2800px] text-6xl font-bold text-white/5 uppercase">Marketing Zone</div>
 
+                {/* Connections Layer (Under Nodes) */}
+                <svg className="absolute top-[-5000px] left-[-5000px] w-[10000px] h-[10000px] pointer-events-none overflow-visible">
+                    {nodes.map((node, i) => {
+                        if (i === 0) return null;
+                        const prev = nodes[i - 1];
+                        return (
+                            <motion.path
+                                key={`line - ${i} `}
+                                initial={{ pathLength: 0, opacity: 0 }}
+                                animate={{ pathLength: 1, opacity: 0.5 }}
+                                transition={{ duration: 1, delay: 0.5 }}
+                                d={getCurvePath(prev.x + 5000 + 128, prev.y + 5000 + 32, node.x + 5000 + 128, node.y + 5000 + 32)}
+                                fill="none"
+                                stroke="#3B82F6"
+                                strokeWidth="2"
+                                strokeDasharray="8 4"
+                            />
+                        )
+                    })}
+                </svg>
+
                 {/* Nodes */}
                 {nodes.map((node, i) => (
                     <motion.div
@@ -414,9 +580,10 @@ export default function SpatialCanvas() {
                         style={{ left: node.x, top: node.y }}
                     >
                         <div className="w-10 h-10 rounded bg-blue-500/20 flex items-center justify-center text-blue-400">
-                            {node.asset?.type === 'image' ? <ImageIcon size={18} /> :
+                            {node.asset?.type === 'image' || node.asset?.type === 'dashboard' ? <ImageIcon size={18} /> :
                                 node.asset?.type === 'code' ? <CodeIcon size={18} /> :
-                                    <FileText size={18} />}
+                                    node.asset?.type === 'video' ? <Zap size={18} /> :
+                                        <FileText size={18} />}
                         </div>
                         <div>
                             <div className="text-sm font-bold">{node.title}</div>
@@ -427,7 +594,8 @@ export default function SpatialCanvas() {
             </motion.div>
 
             {/* Overlays */}
-            {zone === 'trend' && <TrendOverlay visible={true} onStart={handleTrendDone} />}
+            {zone === 'trend' && !showGamePrompt && <TrendOverlay visible={true} onStart={handleTrendDone} />}
+            {showGamePrompt && <PromptOverlay text="Generate a Cyberpunk RPG based on these trends, focusing on neon aesthetics and netrunner mechanics." onComplete={handleGamePromptDone} />}
             {zone === 'builder' && <BuilderSidebar steps={DEMO_SCRIPT} activeStep={activeStep} />}
 
             {/* Asset Lightbox */}

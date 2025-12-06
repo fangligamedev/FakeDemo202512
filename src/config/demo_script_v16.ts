@@ -1,4 +1,4 @@
-export type AssetType = 'markdown' | 'code' | 'image' | 'video' | 'json';
+export type AssetType = 'image' | 'video' | 'code' | 'markdown' | 'dashboard';
 
 export interface DemoStep {
     id: string;
@@ -103,14 +103,25 @@ export const DEMO_SCRIPT: DemoStep[] = [
         duration: 1000
     },
 
+    // --- VIDEO GEN ---
+    {
+        id: 'step_video',
+        title: 'Game Video (VEO 3.1)',
+        description: 'Generating gameplay trailer...',
+        zone: 'marketing', // Or builder? Marketing makes sense for a trailer.
+        duration: 5000,
+        asset: { type: 'video', url: '/assets/demo_v16/gameplay_mock.mp4', previewUrl: '/assets/demo_v16/gameplay_thumb.png' }, // Mock URL
+        uiAction: 'AUTO_PREVIEW'
+    },
+
     // --- MARKING PHASE --- 
     {
         id: 'step_marketing_dashboard',
         title: 'Campaign Dashboard',
         description: 'Real-time analytics setup...',
         zone: 'marketing',
-        duration: 4000,
-        asset: { type: 'image', url: '/assets/demo_v16/marketing_dashboard.png' },
+        duration: 8000,
+        asset: { type: 'dashboard', url: '/assets/demo_v16/dashboard_data.json' },
         uiAction: 'AUTO_PREVIEW'
     },
     {

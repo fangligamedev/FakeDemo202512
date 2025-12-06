@@ -1,0 +1,47 @@
+{
+    "project": "Neon Nights",
+    "status": "Active",
+    "campaign_id": "CP-77-LAUNCH",
+    "metrics": {
+        "impressions": 1250000,
+        "clicks": 45000,
+        "ctr": 3.6,
+        "conversions": 1200,
+        "cpi": 3.50
+    },
+    "demographics": {
+        "us": 45,
+        "eu": 30,
+        "asia": 25
+    },
+    "daily_active_users": [
+        {
+            "day": "Mon",
+            "users": 1200
+        },
+        {
+            "day": "Tue",
+            "users": 1500
+        },
+        {
+            "day": "Wed",
+            "users": 1800
+        },
+        {
+            "day": "Thu",
+            "users": 2200
+        },
+        {
+            "day": "Fri",
+            "users": 3500
+        },
+        {
+            "day": "Sat",
+            "users": 4200
+        },
+        {
+            "day": "Sun",
+            "users": 4500
+        }
+    ]
+}
