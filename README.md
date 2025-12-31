@@ -38,7 +38,7 @@ npm install
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) to view the platform.
+Open [http://localhost:4000](http://localhost:4000) to view the platform.
 
 ---
 *Created and maintained by fangligamedev.*
