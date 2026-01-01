@@ -57,6 +57,11 @@ export default function Home() {
                 <Play className="w-6 h-6 fill-current" /> Try Spatial V2
               </button>
             </Link>
+            <Link href="/spatial_opt">
+              <button className="px-10 py-5 bg-gradient-to-r from-green-500 to-teal-500 text-white text-xl font-bold rounded-full hover:scale-105 transition-transform flex items-center gap-2">
+                <Sparkles className="w-6 h-6" /> Try Optimization V3
+              </button>
+            </Link>
           </motion.div>
         </div>
       </section>
@@ -161,8 +166,8 @@ export default function Home() {
                     transition={{ duration: 1, delay: i * 0.1, type: "spring", stiffness: 50 }}
                     viewport={{ once: true }}
                     className={`w-full rounded-t-lg relative ${isWin
-                        ? 'bg-gradient-to-t from-green-600 to-green-400 shadow-[0_0_20px_rgba(34,197,94,0.3)]'
-                        : 'bg-white/5 border-t border-white/10 hover:bg-white/10 transition-colors'
+                      ? 'bg-gradient-to-t from-green-600 to-green-400 shadow-[0_0_20px_rgba(34,197,94,0.3)]'
+                      : 'bg-white/5 border-t border-white/10 hover:bg-white/10 transition-colors'
                       }`}
                   >
                     {/* Inner Shine Effect for Winner */}

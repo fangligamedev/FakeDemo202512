@@ -460,7 +460,10 @@ function PromptInput({ onSend, visible }: { onSend: (text: string) => void, visi
     )
 }
 
-export default function InfiniteCanvas() {
+// ... imports
+// Add Feedback state
+
+export default function InfiniteCanvasOpt() {
     const [nodes, setNodes] = useState<any[]>([]);
     const [connections, setConnections] = useState<any[]>([]);
     const [isSidebarOpen, setSidebarOpen] = useState(false);
@@ -470,12 +473,16 @@ export default function InfiniteCanvas() {
     const [cursor, setCursor] = useState({ x: -100, y: -100, click: false });
     const [showCursor, setShowCursor] = useState(false);
 
+    // Feedback State
+    const [feedbackText, setFeedbackText] = useState<string | null>(null);
+    const [activeVideo, setActiveVideo] = useState<string>("/assets/demo_opt/V1.mp4");
+
     const initialSteps: AgentStep[] = [
         { id: 1, agent: 'trend', title: 'Market Scan', description: 'Analyzing Steam & Itch.io data...', status: 'pending' },
-        { id: 2, agent: 'trend', title: 'Strategy Lock', description: 'Opportunity: "Psych Horror AVG"', status: 'pending' },
-        { id: 3, agent: 'builder', title: 'Draft Narrative', description: 'Generating plot structure...', status: 'pending' },
-        { id: 4, agent: 'builder', title: 'Assets Gen', description: 'Creating Characters & Env...', status: 'pending' },
-        { id: 5, agent: 'builder', title: 'Core Logic', description: 'Coding Game Engine (RenPy)...', status: 'pending' },
+        { id: 2, agent: 'trend', title: 'Strategy Lock', description: 'Opportunity: "Match-3 Puzzle"', status: 'pending' },
+        { id: 3, agent: 'builder', title: '原型生成 (V1)', description: '生成三消游戏核心玩法原型...', status: 'pending' },
+        { id: 4, agent: 'builder', title: '视觉转向 (V2)', description: '反馈: "改为可爱女孩与水果主题"...', status: 'pending' },
+        { id: 5, agent: 'builder', title: '本地化 (V3)', description: '反馈: "应用中国汉服风格"...', status: 'pending' },
         { id: 6, agent: 'marketing', title: 'Steam Capsule', description: 'Designing store assets...', status: 'pending' },
         { id: 7, agent: 'marketing', title: 'Social Virality', description: 'Drafting launch tweets...', status: 'pending' },
         { id: 8, agent: 'builder', title: 'Final Build', description: 'Compiling release...', status: 'pending' },
@@ -483,10 +490,10 @@ export default function InfiniteCanvas() {
     ];
     const [steps, setSteps] = useState(initialSteps);
 
-    const startV9Demo = () => {
+    const startOptimizer = () => {
         setNodes([]); setConnections([]); setSteps(initialSteps); setSidebarOpen(false); setActiveView('canvas'); setActiveAgent('trend');
         setShowPrompt(true);
-        setTimeout(() => handlePromptSend(), 3500);
+        setTimeout(() => handlePromptSend(), 3500); // Auto-send prompt after 3.5s
     };
 
     const handlePromptSend = () => {
@@ -495,37 +502,76 @@ export default function InfiniteCanvas() {
         setTimeout(() => runTrinityWorkflow(), 500);
     };
 
+    const showFeedback = async (text: string) => {
+        return new Promise<void>(resolve => {
+            let i = 0;
+            const t = setInterval(() => {
+                setFeedbackText(text.slice(0, i));
+                i++;
+                if (i > text.length + 20) {
+                    clearInterval(t);
+                    setTimeout(() => {
+                        setFeedbackText(null);
+                        resolve();
+                    }, 1000);
+                }
+            }, 50);
+        });
+    };
+
     const runTrinityWorkflow = () => {
         let currentStep = 0;
 
-        const executeStep = () => {
-            if (currentStep >= 9) { setShowCursor(false); setActiveView('preview'); return; }
+        const executeStep = async () => {
+            if (currentStep >= 9) { setShowCursor(false); return; }
             const stepConfig = initialSteps[currentStep];
 
-            setActiveAgent(stepConfig.agent); // Switch Sidebar Theme
-
+            setActiveAgent(stepConfig.agent);
             setSteps(prev => prev.map((s, i) => i === currentStep ? { ...s, status: 'running' } : i < currentStep ? { ...s, status: 'done' } : s));
 
             const centerX = (window.innerWidth - 320) / 2;
             const centerY = window.innerHeight / 2;
             const stepId = currentStep + 1;
 
-            // View Switch
-            if (stepId === 5) setActiveView('code'); // Code
-            else setActiveView('canvas');
+            // View Switch logic
+            // V1 Preview (Step 3) -> Show Preview
+            // V2 Preview (Step 4) -> Show Preview
+            // V3 Preview (Step 5) -> Show Preview
+
+            if (stepId === 3) setActiveVideo("/assets/demo_opt/V1.mp4");
+            if (stepId === 4) setActiveVideo("/assets/demo_opt/V2.mp4");
+            if (stepId === 5) setActiveVideo("/assets/demo_opt/V3.mp4");
 
             // Cursor Logic
             let targetX = centerX, targetY = centerY;
-            if (stepId === 1) { targetX = centerX - 300; targetY = centerY - 250; } // Trend
-            if (stepId === 2) { targetX = centerX; targetY = centerY - 150; } // Project
+            if (stepId === 1) { targetX = centerX - 300; targetY = centerY - 250; }
+            if (stepId === 2) { targetX = centerX; targetY = centerY - 150; }
             if (stepId === 3) { targetX = centerX - 250; targetY = centerY + 50; }
             if (stepId === 4) { targetX = centerX; targetY = centerY + 50; }
-            if (stepId === 5) { targetX = window.innerWidth - 200; targetY = 40; } // Code Tab
-            if (stepId === 6) { targetX = centerX + 350; targetY = centerY - 150; } // Marketing Top
-            if (stepId === 7) { targetX = centerX + 350; targetY = centerY + 50; } // Marketing Bot
-            if (stepId === 8) { targetX = centerX; targetY = centerY + 250; } // Build
+            if (stepId === 5) { targetX = window.innerWidth - 200; targetY = 40; }
+            if (stepId === 6) { targetX = centerX + 350; targetY = centerY - 150; }
+            if (stepId === 7) { targetX = centerX + 350; targetY = centerY + 50; }
+            if (stepId === 8) { targetX = centerX; targetY = centerY + 250; }
 
             if (activeView === 'canvas') setCursor({ x: targetX + 100, y: targetY + 50, click: false });
+
+            // Execution Delays & Feedback
+            let interactionDelay = 0;
+
+            if (stepId === 3) { // V1
+                setTimeout(() => setActiveView('preview'), 1500);
+                interactionDelay = 6000;
+            }
+            if (stepId === 4) { // V2
+                await showFeedback("优化方向：改为可爱女孩角色 + 水果主题。");
+                setTimeout(() => setActiveView('preview'), 500);
+                interactionDelay = 6000;
+            }
+            if (stepId === 5) { // V3
+                await showFeedback("本地化：应用中国汉服风格 & 中文界面。");
+                setTimeout(() => setActiveView('preview'), 500);
+                interactionDelay = 6000;
+            }
 
             setTimeout(() => {
                 if (activeView === 'canvas') {
@@ -534,43 +580,44 @@ export default function InfiniteCanvas() {
                 }
 
                 // Node Logic
-                if (stepId === 1) {
-                    setNodes(prev => [...prev, { id: 'trend', type: 'trend', x: centerX - 300, y: centerY - 250, icon: <BarChart3 />, title: 'Trend: Horror', content: 'Growth: +150%' }]);
-                }
+                if (stepId === 1) setNodes(prev => [...prev, { id: 'trend', type: 'trend', x: centerX - 300, y: centerY - 250, icon: <TrendingUp />, title: 'Trend: Match-3', content: 'Growth: +150%' }]);
                 if (stepId === 2) {
-                    setNodes(prev => [...prev, { id: 'project', type: 'project', x: centerX, y: centerY - 150, icon: <Box />, title: 'Project: Doki', content: 'Strategy: Viral' }]);
+                    setNodes(prev => [...prev, { id: 'project', type: 'project', x: centerX, y: centerY - 150, icon: <Box />, title: 'Project: Candy', content: 'Strategy: Casual' }]);
                     setConnections(prev => [...prev, { from: 'trend', to: 'project', type: 'trend' }]);
                 }
-                if (stepId === 3) { // Builder
-                    setNodes(prev => [...prev, { id: 'script', type: 'default', x: centerX - 250, y: centerY + 50, icon: <FileText />, title: 'Script', content: 'Drafting...' }]);
-                    setConnections(prev => [...prev, { from: 'project', to: 'script' }]);
+
+                // Builder Nodes (V1, V2, V3)
+                if (stepId === 3) {
+                    setNodes(prev => [...prev, { id: 'v1', type: 'default', x: centerX - 250, y: centerY + 50, icon: <ImageIcon />, title: 'V1 Prototype', content: 'Generating...' }]);
+                    setConnections(prev => [...prev, { from: 'project', to: 'v1' }]);
                 }
-                if (stepId === 4) { // Assets
-                    setNodes(prev => [...prev, { id: 'assets', type: 'default', x: centerX, y: centerY + 50, icon: <ImageIcon />, title: 'Assets', content: 'Monika & BG' }]);
-                    setConnections(prev => [...prev, { from: 'project', to: 'assets' }]);
+                if (stepId === 4) {
+                    setNodes(prev => [...prev, { id: 'v2', type: 'default', x: centerX, y: centerY + 50, icon: <Sparkles />, title: 'V2 Updated', content: 'Girl & Fruit' }]); // Overlap/Replace
+                    setConnections(prev => [...prev, { from: 'v1', to: 'v2' }]);
                 }
-                if (stepId === 5) { // Logic (Code View)
-                    // Hidden node creation
-                    setNodes(prev => [...prev, { id: 'engine', type: 'code', x: centerX, y: centerY + 150, icon: <Cpu />, title: 'Engine', content: 'RenPy' }]);
-                    setConnections(prev => [...prev, { from: 'script', to: 'engine' }, { from: 'assets', to: 'engine' }]);
+                if (stepId === 5) {
+                    setNodes(prev => [...prev, { id: 'v3', type: 'default', x: centerX, y: centerY + 150, icon: <Globe />, title: 'V3 Localized', content: 'Chinese Style' }]);
+                    setConnections(prev => [...prev, { from: 'v2', to: 'v3' }]);
                 }
-                if (stepId === 6) { // Marketing Steam
+
+                // Marketing
+                if (stepId === 6) {
+                    setActiveView('canvas'); // Return to canvas
                     setNodes(prev => [...prev, { id: 'steam', type: 'marketing', x: centerX + 350, y: centerY - 150, icon: <ShoppingBag />, title: 'Steam Page', content: 'Capsule Art' }]);
                     setConnections(prev => [...prev, { from: 'project', to: 'steam', type: 'marketing' }]);
                 }
-                if (stepId === 7) { // Marketing Social
+                if (stepId === 7) {
                     setNodes(prev => [...prev, { id: 'social', type: 'marketing', x: centerX + 350, y: centerY + 50, icon: <Twitter />, title: 'Viral Tweet', content: '#IndieDev' }]);
                     setConnections(prev => [...prev, { from: 'steam', to: 'social', type: 'marketing' }]);
                 }
-                if (stepId === 8) { // Build
+                if (stepId === 8) {
                     setNodes(prev => [...prev, { id: 'build', type: 'default', x: centerX, y: centerY + 300, icon: <CheckCircle2 />, title: 'Release', content: 'Ready' }]);
-                    setConnections(prev => [...prev, { from: 'engine', to: 'build' }]);
+                    setConnections(prev => [...prev, { from: 'v3', to: 'build' }]);
                 }
 
-            }, 800);
+            }, 800 + interactionDelay);
 
-            let delay = 3000;
-            if (stepId === 5) delay = 5000;
+            let delay = 3000 + interactionDelay;
 
             setTimeout(() => {
                 setSteps(prev => prev.map((s, i) => i === currentStep ? { ...s, status: 'done' } : s));
@@ -582,6 +629,7 @@ export default function InfiniteCanvas() {
         executeStep();
     };
 
+    // UI Render
     return (
         <div className="relative w-full h-screen bg-[#050505] overflow-hidden text-white font-sans">
             <div className="absolute inset-0 opacity-20 pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle, #333 1px, transparent 1px)', backgroundSize: '24px 24px' }} />
@@ -593,14 +641,50 @@ export default function InfiniteCanvas() {
             <ViewTabs active={activeView} onChange={setActiveView} />
 
             <CodeEditorView visible={activeView === 'code'} />
-            <PreviewView visible={activeView === 'preview'} />
+
+            {/* Modified Preview View with Active Video */}
+            <AnimatePresence>
+                {activeView === 'preview' && (
+                    <motion.div
+                        initial={{ opacity: 0, scale: 0.95 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.95 }}
+                        transition={{ duration: 0.5 }}
+                        className="absolute inset-0 z-20 flex bg-black items-center justify-center overflow-hidden"
+                    >
+                        <video
+                            src={activeVideo}
+                            className="w-full h-full object-contain"
+                            autoPlay
+                            loop
+                            controls
+                        />
+                        <div className="absolute top-8 left-8 bg-black/50 backdrop-blur border border-white/10 px-4 py-2 rounded-full flex gap-3 text-xs text-white">
+                            <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" /> Running: Optimizer</span>
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+
+            {/* Feedback Overlay */}
+            <AnimatePresence>
+                {feedbackText && (
+                    <motion.div initial={{ opacity: 0, y: 50 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -50 }} className="absolute bottom-1/4 left-1/2 -translate-x-1/2 z-50">
+                        <div className="bg-[#1C1C1E]/90 backdrop-blur border border-blue-500/30 rounded-2xl shadow-2xl p-4 flex items-center gap-4 min-w-[500px]">
+                            <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center shrink-0 animate-pulse"><Sparkles className="w-5 h-5 text-white" /></div>
+                            <div className="text-xl font-mono text-white">
+                                <span className="text-blue-400 mr-2">User Feedback:</span>
+                                {feedbackText}
+                                <span className="animate-pulse">_</span>
+                            </div>
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
 
             <div className="absolute top-8 left-8 flex gap-4 z-40">
-                <button onClick={startV9Demo} className="px-6 py-2 bg-gradient-to-r from-purple-600 to-blue-600 rounded-full text-sm font-bold shadow-lg hover:opacity-90 flex items-center gap-2">
-                    <Play className="w-4 h-4" /> Start Trinity Demo
-                </button>
-                <button onClick={() => window.location.href = '/spatial_opt'} className="px-6 py-2 bg-gradient-to-r from-green-600 to-teal-600 rounded-full text-sm font-bold shadow-lg hover:opacity-90 flex items-center gap-2">
-                    <Zap className="w-4 h-4" /> Start Optimization Demo
+                <button onClick={startOptimizer} className="px-6 py-2 bg-gradient-to-r from-green-600 to-teal-600 rounded-full text-sm font-bold shadow-lg hover:opacity-90 flex items-center gap-2">
+                    <Zap className="w-4 h-4" /> Start Optimization Demo (开始演示)
                 </button>
             </div>
 

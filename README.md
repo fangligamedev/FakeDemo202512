@@ -2,31 +2,36 @@
 
 Welcome to the **Fake Demo 202512** repository. This platform is designed for the high-fidelity generation and showcasing of AI-driven product demos, integrating advanced visualization and data-driven simulation logic.
 
-## 🚀 Project Overview
+## 🚀 Recent Updates - V0.31 (2026-01-01)
 
-This project serves as a comprehensive toolset for creating "Pitch Demos" that demonstrate the potential of AI applications through immersive storytelling and technical simulations. It includes a 3D spatial canvas for product presentation and a backend integration for data-driven demo scripts.
+This release introduces the **Asset Optimization Demo**, showcasing the V1->V2->V3 iterative AI generation journey for game assets.
+
+- **[Optimization Demo (V1->V3)](http://localhost:4000/spatial_opt)**: A new interactive flow demonstrating rapid asset pivot and localization (Match-3 Game evolution).
+- **Comprehensive Documentation**:
+    - [PRD.md](file:///Users/brucef/Documents/LocDev/WebSite/ai-platform/PRD.md) - Product Requirements for the Trinity AI Game Designer.
+    - [SDD.md](file:///Users/brucef/Documents/LocDev/WebSite/ai-platform/SDD.md) - Software Design for Agentic Orchestration.
+    - [optimization_instance.md](file:///Users/brucef/Documents/LocDev/WebSite/ai-platform/optimization_instance.md) - Case Study of the V1-V3 optimization process.
 
 ## ✨ Key Features
 
-- **3D Spatial Canvas**: An interactive 3D environment for presenting AI product concepts and workflows.
-- **Data-Driven Demo Logic**: Support for YAML-based demo scripts and WebSocket communication to drive real-time demo interactions.
-- **Localized Strategic Reports**: In-depth analysis and market entry strategies, including:
-    - [报告博主版.md](file:///Users/brucef/Documents/LocDev/WebSite/ai-platform/报告博主版.md) - Tailored for content creators and influencers.
-    - [报告5_海外冷启动.md](file:///Users/brucef/Documents/LocDev/WebSite/ai-platform/报告5_海外冷启动.md) - Focus on overseas market cold start strategies.
-    - Other strategic documents in the root directory.
-- **Asset Integration**: Centralized management of video demos, avatars, and configuration files for rapid demo iteration.
+- **Infinite Canvas (Trinity Demo)**: A node-based visualization of the AI game building workflow.
+- **Optimization Flow (V1->V3)**: An isolated, iterative demonstration of asset evolution with simulated user feedback.
+- **3D Spatial Canvas**: An interactive 3D environment for presenting AI product concepts.
+- **Data-Driven Demo Logic**: Support for YAML-based demo scripts and WebSocket communication.
+- **Localized Strategic Reports**: Including influencer outreach and overseas cold start strategies.
 
 ## 🛠 Tech Stack
 
-- **Frontend**: Next.js, React, Tailwind CSS.
-- **3D Rendering**: Three.js / React Three Fiber (in `SpatialCanvas`).
+- **Frontend**: Next.js, React, Tailwind CSS, Framer Motion.
+- **3D Rendering**: Three.js / React Three Fiber.
 - **Communication**: WebSocket for external script synchronization.
 
 ## 📂 Directory Structure
 
-- `src/components/demo`: Core demo UI components and the Spatial Canvas.
-- `public/assets/demo_v16`: Media assets, textures, and data files for demo version 16.
-- `src/config`: High-level configuration and script definitions for demo flows.
+- `src/components/demo`: Core demo UI components (`InfiniteCanvasOpt`, `SpatialCanvas`).
+- `src/app/spatial_opt`: Entry point for the new Optimization Demo.
+- `public/assets/demo_opt`: High-quality video and image assets for the V1-V3 flow.
+- `src/config`: Script definitions for demo flows.
 
 ## 🏁 Getting Started
 
@@ -42,3 +47,4 @@ Open [http://localhost:4000](http://localhost:4000) to view the platform.
 
 ---
 *Created and maintained by fangligamedev.*
+
