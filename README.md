@@ -1,50 +1,113 @@
 # Fake Demo 202512 - AI Strategic Platform
 
-Welcome to the **Fake Demo 202512** repository. This platform is designed for the high-fidelity generation and showcasing of AI-driven product demos, integrating advanced visualization and data-driven simulation logic.
+## 🚀 Recent Release - V0.32
+This release incorporates **Round 9 Refinements** for the Optimization Demo, focusing on interaction rhythm, enhanced visual feedback, and reliable node orchestration.
 
-## 🚀 Recent Updates - V0.31 (2026-01-01)
+---
 
-This release introduces the **Asset Optimization Demo**, showcasing the V1->V2->V3 iterative AI generation journey for game assets.
+# V0.4 优化演示流程改进计划 (Implementation Plan)
 
-- **[Optimization Demo (V1->V3)](http://localhost:4000/spatial_opt)**: A new interactive flow demonstrating rapid asset pivot and localization (Match-3 Game evolution).
-- **Comprehensive Documentation**:
-    - [PRD.md](file:///Users/brucef/Documents/LocDev/WebSite/ai-platform/PRD.md) - Product Requirements for the Trinity AI Game Designer.
-    - [SDD.md](file:///Users/brucef/Documents/LocDev/WebSite/ai-platform/SDD.md) - Software Design for Agentic Orchestration.
-    - [optimization_instance.md](file:///Users/brucef/Documents/LocDev/WebSite/ai-platform/optimization_instance.md) - Case Study of the V1-V3 optimization process.
+## 目标
+将当前线性的“仅观看”优化演示转变为交互式、细粒度的构建过程。 用户希望将“构建”阶段细分，增加看图确认环节：
 
-## ✨ Key Features
+1. **意图识别**：系统分析提示词。
+2. **资产生成**：系统生成并展示静态图像（包括主页、玩法、商店等 4 张图）。
+3. **用户确认**：用户必须明确点击“确认”才能继续。
+4. **游戏构建**：系统“编译”游戏。
+5. **运行**：系统播放视频。
 
-- **Infinite Canvas (Trinity Demo)**: A node-based visualization of the AI game building workflow.
-- **Optimization Flow (V1->V3)**: An isolated, iterative demonstration of asset evolution with simulated user feedback.
-- **3D Spatial Canvas**: An interactive 3D environment for presenting AI product concepts.
-- **Data-Driven Demo Logic**: Support for YAML-based demo scripts and WebSocket communication.
-- **Localized Strategic Reports**: Including influencer outreach and overseas cold start strategies.
+此循环将完整重复进行 V1、V2 和 V3 三个阶段。
 
-## 🛠 Tech Stack
+## 现有资产确认
+`/public/assets/demo_opt/` 目录中已包含所有必要的静态图和视频资产：
+- **V1 (原型)**: `v1_home.jpg`, `v1_gameplay.jpg`, `v1_shop_ui.jpg` ... `V1.mp4`
+- **V2 (视觉迭代)**: `v2_home.png`, `v2_gameplay.png`, `v2_shop.png` ... `V2.mp4`
+- **V3 (本地化)**: `v3_home.png`, `v3_gameplay.png`, `v3_shop.png` ... `V3.mp4`
 
-- **Frontend**: Next.js, React, Tailwind CSS, Framer Motion.
-- **3D Rendering**: Three.js / React Three Fiber.
-- **Communication**: WebSocket for external script synchronization.
+## InfiniteCanvasOpt.tsx 修改计划
 
-## 📂 Directory Structure
+### 1. 新增 UI 组件
+- **AssetGrid (资产网格)**：一个新的模态框组件，用于以 2x2 网格形式显示 4 张生成的图像（主页、玩法、商店、胜利界面）。
+- **ActionPanel (操作栏)**：位于网格下方的控制栏，包含“Regenerate (重新生成)”（演示用，仅模拟效果）和“Confirm & Build (确认并构建)”按钮。
 
-- `src/components/demo`: Core demo UI components (`InfiniteCanvasOpt`, `SpatialCanvas`).
-- `src/app/spatial_opt`: Entry point for the new Optimization Demo.
-- `public/assets/demo_opt`: High-quality video and image assets for the V1-V3 flow.
-- `src/config`: Script definitions for demo flows.
+### 2. 状态机逻辑更新
+将原本基于 setTimeout 的线性 `runTrinityWorkflow` 改造为支持 await 等待用户输入的异步流程。
+- **当前逻辑**：自动延时 -> 下一步。
+- **新逻辑**：显示预览 -> await waitForUserConfirmation() -> 用户点击 -> 下一步。
 
-## 🏁 Getting Started
-
-To run the platform locally:
-
-```bash
-cd ai-platform
-npm install
-npm run dev
+### 3. 工作流伪代码更新 (Round 3)
+```typescript
+async function startV1() {
+  // 1. 趋势雷达 (新增)
+  await showTrendRadarView(); // 切换到雷达/网页视图
+  await createNode('trend', 'Market Scan', 'Scanning...'); 
+  
+  // 3. Builder - 资产生成 (优化)
+  await showAssetEditor(v1_images, { simulateLoading: true });
+  
+  // 5. 构建 -> 部署 -> Agent 调用
+  await spawnNode('Deployer', 'Staging');
+  await spawnNode('Tester', 'Verifying');
+  
+  playVideo(V1_MP4);
+}
 ```
 
-Open [http://localhost:4000](http://localhost:4000) to view the platform.
+### 4. Marketing Agent 增强
+- **Live Metrics**: 添加数字跳动效果 (CountUp)，让仪表盘看起来是实时的。
+- **Steam Page**: 弹窗展示生成的 Steam 胶囊图 (Capsule Art) 和简介。
+- **Social Post**: 弹窗展示推文草稿 (Tweet Mockup)。
+
+### 5. 布局优化 (Space out)
+- **间距**: 大幅增加节点间的 X 轴距离 (e.g., +400px per step)。
+- **有机感**: 给节点 Y 轴增加轻微随机偏移，避免过于整齐。
+
+---
+
+# 优化演示 V0.4 验证指南 (Walkthrough)
+
+本文档概述了 V0.4 优化演示的新功能及验证步骤。
+
+## V0.4 新增功能
+演示已升级为完全交互式的流程，模拟真实的 AI 游戏开发生命周期：
+- **Trend Radar**: 演示起始于 "Trend Agent"，首先进行市场扫描。
+- **人工确认 (Human-in-the-Loop)**: 用户必须明确点击 "Confirm & Build" (确认并构建) 按钮，才能从设计阶段进入构建阶段。
+- **Agent Ops**: 部署和测试阶段由独立的 "Deployer Agent" 和 "Tester Agent" 节点可视化执行。
+- **Marketing Dashboard (Live)**: 营销界面升级为实时动态仪表盘，显示构建时间和优化分数。
+
+## 验证清单
+
+### 阶段 1: 趋势识别 (Trend Discovery)
+- [ ] 点击 "Start Optimization Demo"。
+- [ ] 观察 Trend Radar: 画布左侧出现独立的 "Trend Radar" 网页节点，显示扫描动画。
+- [ ] 提示词: 输入框应自动补齐 "Build a Match-3 game based on current Trend Radar strategies."。
+- [ ] 验证相机会自动平移以保持当前流程在屏幕中央。
+
+### 阶段 2: V1 原型 (V1 Prototype - "Casual")
+- [ ] **资产编辑器 (Asset Editor)**:
+    - 验证图片是否以全比例 (Contain) 显示。
+    - 交互测试: 点击任意图片，验证是否弹出“放大视图”。
+- [ ] **Asset Editor Demo (V1 Only)**:
+    - 验证点击 "Preview V1" 后，Asset Editor 自动打开 (V1 Title).
+    - 验证放大 Image 0 (Home) -> 关闭.
+    - 验证放大 Image 1 (Game) -> 自动打字 "Generate other scenes..." (速度适中, clear) -> Loading (3s) -> 显示 V1 Shop 图片.
+    - 验证自动关闭 Modal.
+- [ ] **操作面板 (Action Panel)**: 验证底部出现 "Confirm & Build" 按钮。
+- [ ] **Agent 化部署与验证**:
+    - 视图切回 Canvas。
+    - 节点验证: 出现独立的 "Deployer Agent" 和 "Tester Agent" 节点。
+- [ ] **预览**: 视图切换到 Preview 并播放 `V1.mp4`。
+
+### 阶段 3: V2 & V3 迭代
+- [ ] **相机平移**: 验证画布向左平移，展示 V2/V3 区域。
+- [ ] **Modal Feedback**: 验证 V2/V3 迭代时，Prompt 输入框自动打字反馈 (速度适中, clear)。
+- [ ] **Marketing Link**: 验证 V3 Play 节点 -> Marketing Node 有橙色连线 (确保连线已生成)。
+- [ ] **Marketing Sub-nodes**: 验证 Marketing 节点 -> Steam/Social 节点均有连线 (Delay确保渲染)。
+
+### 阶段 4: 营销 (Marketing)
+- [ ] **Live Dashboard**: 验证顶部的 "Live Dashboard" 标签在闪烁。
+- [ ] **Metrics**: 验证底部的 "Optimization Score" 和 "Build Time" 数据在动态增长。
+- [ ] **Steam/Social**: 验证 Steam 商店预览和社媒生成记录。
 
 ---
 *Created and maintained by fangligamedev.*
-
