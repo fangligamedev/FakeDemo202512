@@ -202,7 +202,7 @@ function Connection({ start, end, type = 'default' }: { start: { x: number, y: n
     const strokeColor = type === 'trend' ? '#9333EA' : type === 'marketing' ? '#F97316' : '#3B82F6';
 
     return (
-        <svg className="absolute top-0 left-0 w-full h-full pointer-events-none" style={{ zIndex: 0 }}>
+        <svg className="absolute top-0 left-0 w-full h-full pointer-events-none overflow-visible" style={{ zIndex: 0 }}>
             <path
                 d={`M ${sx} ${sy} C ${midX} ${sy}, ${midX} ${ey}, ${ex} ${ey}`}
                 stroke={strokeColor} strokeWidth="6" fill="none" opacity="0.1"
@@ -1101,6 +1101,39 @@ export default function InfiniteCanvasOpt() {
         // Done
         setSteps(prev => prev.map(s => ({ ...s, status: 'done' })));
     };
+
+
+    // --- Connection Healer (Safety Net) ---
+    // Automatically adds missing links if nodes exist (Fixes V3->Marketing issue)
+    useEffect(() => {
+        if (nodes.length === 0) return;
+
+        const hasV3Play = nodes.some(n => n.id === 'v3play');
+        const hasMarketing = nodes.some(n => n.id === 'marketing');
+        const hasSteam = nodes.some(n => n.id === 'market_steam');
+        const hasSocial = nodes.some(n => n.id === 'market_social');
+
+        if (hasV3Play && hasMarketing) {
+            setConnections(prev => {
+                if (prev.find(c => c.from === 'v3play' && c.to === 'marketing')) return prev;
+                return [...prev, { from: 'v3play', to: 'marketing', type: 'marketing' }];
+            });
+        }
+
+        if (hasMarketing && hasSteam) {
+            setConnections(prev => {
+                if (prev.find(c => c.from === 'marketing' && c.to === 'market_steam')) return prev;
+                return [...prev, { from: 'marketing', to: 'market_steam', type: 'marketing' }];
+            });
+        }
+
+        if (hasMarketing && hasSocial) {
+            setConnections(prev => {
+                if (prev.find(c => c.from === 'marketing' && c.to === 'market_social')) return prev;
+                return [...prev, { from: 'marketing', to: 'market_social', type: 'marketing' }];
+            });
+        }
+    }, [nodes, connections]); // Check whenever nodes or connections update
 
     // UI Render
     return (
